@@ -25,7 +25,6 @@
 		<input type="submit" id="btnSalida" value="Salida">
 	</body>
 	<script type="text/javascript">
-		var registro = {}
 		var registros = []
 		var tipos = {
 			entrada: 1,
@@ -53,15 +52,15 @@
 		});
 
 		$("#btnAyer").on('click', function(event) {
-			var d = new Date();
-			d.setDate(d.getDate() - 1);
-			$("#datetimeInput").datetimepicker('setDate', d);
+			var f = new Date();
+			f.setDate(f.getDate() - 1);
+			$("#datetimeInput").datetimepicker('setDate', f);
 		});
 
 		$("#btnEntrada, #btnSalida").on('click', function(event) {
 			registro = {
-				datetime: $("#datetimeInput").datetimepicker('getDate'),
-				code: $("#selectCode").val(),
+				fecha: $("#datetimeInput").datetimepicker('getDate'),
+				codigo: $("#selectCode").val(),
 				tipo: ((event.target.id === "btnEntrada") ? tipos.entrada : tipos.salida)
 			}
 			registros.push(registro);
