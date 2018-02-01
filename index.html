@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8"> 
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.css" />
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-sliderAccess.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/i18n/jquery-ui-timepicker-es.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
+		<title>Tieve</title>
+	</head>
+	<body>
+		<input type="submit" id="btnAyer" value="Ayer">
+		<input type="submit" id="btnHoy" value="Hoy">
+		<input id="datetimeInput" />
+		<select id="selectCode">
+			<option value="1">Código 001</option>
+			<option value="6">Código 006</option>
+			<option value="7">Código 007</option>
+		</select>
+		<input type="submit" id="btnEntrada" value="Entrada">
+		<input type="submit" id="btnSalida" value="Salida">
+	</body>
+	<script type="text/javascript">
+		var registro = {}
+		var registros = []
+
+		$(function() {
+			var timepickerConfig = {
+				dateFormat: "dd-mm-yy",
+				timeFormat: "HH:mm:ss"
+			};
+			$("#datetimeInput").datetimepicker(timepickerConfig);
+			$("#datetimeInput").datetimepicker('setDate', (new Date()));
+		});
+
+		$("#btnHoy").on('click', function(event) {
+			$("#datetimeInput").datetimepicker('setDate', (new Date()));
+		});
+
+		$("#btnAyer").on('click', function(event) {
+			var d = new Date();
+			d.setDate(d.getDate() - 1);
+			$("#datetimeInput").datetimepicker('setDate', d);
+		});
+
+		$("#btnEntrada, #btnSalida").on('click', function(event) {
+			registro = {
+				datetime: $("#datetimeInput").datetimepicker('getDate'),
+				code: $("#selectCode").val()
+			}
+			registros.push(registro);
+		});
+	</script>
+</html>
