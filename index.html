@@ -27,15 +27,26 @@
 	<script type="text/javascript">
 		var registro = {}
 		var registros = []
+		var tipos = {
+			entrada: 1,
+			salida: 0
+		}
 
+		//Llamadas a funciones tras carga del documento web
 		$(function() {
+			initTimePicker();
+		});
+
+		//Establecimiento de configuración e inicialización del datepicker
+		//con fecha actual
+		var initTimePicker = function() {
 			var timepickerConfig = {
 				dateFormat: "dd-mm-yy",
 				timeFormat: "HH:mm:ss"
 			};
 			$("#datetimeInput").datetimepicker(timepickerConfig);
 			$("#datetimeInput").datetimepicker('setDate', (new Date()));
-		});
+		}
 
 		$("#btnHoy").on('click', function(event) {
 			$("#datetimeInput").datetimepicker('setDate', (new Date()));
@@ -50,7 +61,8 @@
 		$("#btnEntrada, #btnSalida").on('click', function(event) {
 			registro = {
 				datetime: $("#datetimeInput").datetimepicker('getDate'),
-				code: $("#selectCode").val()
+				code: $("#selectCode").val(),
+				tipo: ((event.target.id === "btnEntrada") ? tipos.entrada : tipos.salida)
 			}
 			registros.push(registro);
 		});
