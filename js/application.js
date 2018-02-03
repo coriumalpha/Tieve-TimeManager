@@ -41,35 +41,6 @@ var addNewRegistro = function(registro) {
 	}
 }
 
-var calculateEventsOld = function(registros) {
-	var events = {};
-	var badges = "";
-
-	var codeOne = $.grep(registros, function(value) {
-		return value.codigo === "1"
-	});
-
-	if (codeOne.length == 2) {
-		var entrada = $.grep(codeOne, function(value) {
-			return value.tipo == tipos.entrada;
-		});
-		var salida = $.grep(codeOne, function(value) {
-			return value.tipo == tipos.salida;
-		});
-
-		var duracion = getDateDiff(entrada[0].fecha, salida[0].fecha);
-		badges += '<span class="badge badge-secondary">' + duracion + '</span>'
-	} else {
-		$.each(registros, function(key, value) {
-			var hora = moment(value.fecha).format("HH:mm:ss");
-			badges += '<span class="badge badge-secondary">' + literales.tipos[value.tipo] + ' ' + hora + '</span>'
-		});
-	}
-
-	events.badges = badges;
-	return events;
-}
-
 var calculateEvents = function(registros) {
 	var events = {};
 	var badges = "";
@@ -86,12 +57,7 @@ var calculateEvents = function(registros) {
 		if (posiblesSalidas.length == 0) {
 			//Sólo hay entrada, badge de entrar!
 			var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
-			badges += '<span class="badge badge-secondary">' + literales.tipos[entrada.tipo] + ' (' + entrada.codigo + ') ' + horaEntrada + '</span>'
-		} else if (posiblesSalidas.length == 1) {
-			//Calcular diferencias y badge de entrada-salida
-			var duracion = getDateDiff(entrada.fecha, posiblesSalidas[0].fecha);
-			var horaEntrada = secondsTimeSpanToHMS(duracion);
-			badges += '<span class="badge badge-secondary">' + ' (' + entrada.codigo + ') ' + horaEntrada + '</span>'
+			badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + '">' + literales.tipos[entrada.tipo] + ' ' + literales.codigos[entrada.codigo] + ' ' + horaEntrada + '</span>'
 		} else {
 			//Encontrar el más cercano y hacer badge de entrada-salida con él
 			var minDuration;
@@ -99,21 +65,22 @@ var calculateEvents = function(registros) {
 
 			$.each(posiblesSalidas, function(key, posibleSalida) {
 				if (typeof(minDuration) === "undefined") {
-					minDuration = getDateDiff(posibleSalida.fecha, entrada.fecha);
+					minDuration = getDateDiff(entrada.fecha, posibleSalida.fecha);
 					salida = posibleSalida;
 					return				
 				}
-				var dateDiff = getDateDiff(posibleSalida.fecha, entrada.fecha);
+				var dateDiff = getDateDiff(entrada.fecha, posibleSalida.fecha);
 				if (dateDiff < minDuration)
 				{
 					minDuration = dateDiff;
 					salida = posibleSalida;
 				} 
+				console.log(minDuration);
 			});
 
 			var duracion = getDateDiff(entrada.fecha, salida.fecha);
 			var horaEntrada = secondsTimeSpanToHMS(duracion);
-			badges += '<span class="badge badge-secondary">' + ' (' + entrada.codigo + ') ' + horaEntrada + '</span>'
+			badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + '">' + literales.codigos[entrada.codigo] + ' ' + horaEntrada + '</span>'
 		}
 	});
 

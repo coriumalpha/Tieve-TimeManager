@@ -7,7 +7,20 @@ var literales = {
 	tipos : {
 		0: "Salida",
 		1: "Entrada",
+	},
+	codigos: {
+		1: "Jornada",
+		3: "Almuerzo",
+		6: "Código 6",
+		7: "Comida",
 	}
+}
+
+var codigosLabel = {
+	1: "primary",
+	3: "success",
+	6: "warning",
+	7: "info",
 }
 
 var getDateDiff = function(date1, date2) {
