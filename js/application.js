@@ -1,5 +1,6 @@
 var tablaRegistros;
-var registros = []
+var registros = [];
+var dias = [];
 
 var tipos = {
 	entrada: 1,
@@ -21,25 +22,77 @@ $(function() {
 	initTablaRegistros();
 });
 
-var drawRegistro = function(registro) {
-	var f = moment(registro.fecha);
-	tablaRegistros.row.add([
-		f.format('DD [de] MMMM'),
-		f.format('HH:mm:ss'),
-		registro.codigo,
-		literales.tipos[registro.tipo]
-	]).draw();
+var addNewRegistro = function(registro) {
+	var idDia;
+	var dia;
+	$.each(dias, function(key, value) {
+		//Colocamos las horas a cero para excluir el tiempo de la comparación
+		var rf = registro.fecha.setHours(0,0,0,0);
+		if (value.fecha.valueOf() === rf.valueOf()) {
+			//El día existe en dias[] por lo que extraemos su id
+			idDia = value.id;
+			return;
+		}
+	});
+
+	if (typeof(idDia) === "undefined") {
+		//El día no existía, por lo que creamos uno nuevo
+		dia = {
+			id: dias.length,
+			fecha: registro.fecha.setHours(0,0,0,0),
+			registros: []
+		}
+		dia.registros.push(registro);
+
+		dias.push(dia);
+		drawDia(dia);
+	} else {
+		dias[idDia].registros.push(registro);
+		updateDia(dias[idDia]);
+	}
+}
+
+var drawDia = function(dia) {
+	var f = moment(dia.fecha);
+	var tableRow = {
+		id: dia.id,
+		dia: f.format('DD [de] MMMM'),
+		eventos: "Eventos relativos al día",
+		total: "08:30:00",
+		acumulativo: "00:00:00",
+	}
+	var row = tablaRegistros.row.add(tableRow).draw();
+}
+
+var updateDia = function(dia) {
+	//var rowData = tablaRegistros.row(dia.id).data();
+	var f = moment(dia.fecha);
+	var tableRow = {
+		id: dia.id,
+		dia: f.format('DD [de] MMMM'),
+		eventos: "Eventos relativos al día",
+		total: "08:30:00",
+		acumulativo: "jijijouij",
+	}
+	tablaRegistros.row(dia.id).data(tableRow).draw();
 }
 
 var initTablaRegistros = function() {
 	var tableConfig = {
+		rowId: 'id',
 		searching: false,
 		select: false,
 		paging: false,
 		info: false,
 		language: {
 			emptyTable: "No hay registros que mostrar.",
-		}
+		},
+		columns: [
+			{data: "dia"},
+			{data: "eventos"},
+			{data: "total"},
+			{data: "acumulativo"},
+		]
 	}			
 	tablaRegistros = $("#tablaRegistros").DataTable(tableConfig);
 }
@@ -71,6 +124,5 @@ $("#btnEntrada, #btnSalida").on('click', function(event) {
 		codigo: $("#selectCode").val(),
 		tipo: ((event.target.id === "btnEntrada") ? tipos.entrada : tipos.salida)
 	}
-	registros.push(registro);
-	drawRegistro(registro);
+	addNewRegistro(registro);
 });
