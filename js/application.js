@@ -2,18 +2,6 @@ var tablaRegistros;
 var registros = [];
 var dias = [];
 
-var tipos = {
-	entrada: 1,
-	salida: 0
-}
-
-var literales = {
-	tipos : {
-		0: "Salida",
-		1: "Entrada",
-	}
-}
-
 //Llamadas a funciones tras carga del documento web
 $(function() {
 	moment().locale('es');
@@ -53,19 +41,94 @@ var addNewRegistro = function(registro) {
 	}
 }
 
-var drawDia = function(dia, method) {
+var calculateEventsOld = function(registros) {
+	var events = {};
 	var badges = "";
-	var f = moment(dia.fecha);
 
-	$.each(dia.registros, function(key, value) {
-		var hora = moment(value.fecha).format("HH:mm:ss");
-		badges += '<span class="badge badge-secondary">' + literales.tipos[value.tipo] + ' ' + hora + '</span>'
+	var codeOne = $.grep(registros, function(value) {
+		return value.codigo === "1"
 	});
+
+	if (codeOne.length == 2) {
+		var entrada = $.grep(codeOne, function(value) {
+			return value.tipo == tipos.entrada;
+		});
+		var salida = $.grep(codeOne, function(value) {
+			return value.tipo == tipos.salida;
+		});
+
+		var duracion = getDateDiff(entrada[0].fecha, salida[0].fecha);
+		badges += '<span class="badge badge-secondary">' + duracion + '</span>'
+	} else {
+		$.each(registros, function(key, value) {
+			var hora = moment(value.fecha).format("HH:mm:ss");
+			badges += '<span class="badge badge-secondary">' + literales.tipos[value.tipo] + ' ' + hora + '</span>'
+		});
+	}
+
+	events.badges = badges;
+	return events;
+}
+
+var calculateEvents = function(registros) {
+	var events = {};
+	var badges = "";
+
+	var registrosEntrada = $.grep(registros, function(value) {
+		return value.tipo === tipos.entrada;
+	});
+
+	$.each(registrosEntrada, function(key, entrada) {
+		var posiblesSalidas = $.grep(registros, function(value) {
+			return value.codigo === entrada.codigo && value.tipo === tipos.salida;
+		});
+
+		if (posiblesSalidas.length == 0) {
+			//Sólo hay entrada, badge de entrar!
+			var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
+			badges += '<span class="badge badge-secondary">' + literales.tipos[entrada.tipo] + ' (' + entrada.codigo + ') ' + horaEntrada + '</span>'
+		} else if (posiblesSalidas.length == 1) {
+			//Calcular diferencias y badge de entrada-salida
+			var duracion = getDateDiff(entrada.fecha, posiblesSalidas[0].fecha);
+			var horaEntrada = secondsTimeSpanToHMS(duracion);
+			badges += '<span class="badge badge-secondary">' + ' (' + entrada.codigo + ') ' + horaEntrada + '</span>'
+		} else {
+			//Encontrar el más cercano y hacer badge de entrada-salida con él
+			var minDuration;
+			var salida;
+
+			$.each(posiblesSalidas, function(key, posibleSalida) {
+				if (typeof(minDuration) === "undefined") {
+					minDuration = getDateDiff(posibleSalida.fecha, entrada.fecha);
+					salida = posibleSalida;
+					return				
+				}
+				var dateDiff = getDateDiff(posibleSalida.fecha, entrada.fecha);
+				if (dateDiff < minDuration)
+				{
+					minDuration = dateDiff;
+					salida = posibleSalida;
+				} 
+			});
+
+			var duracion = getDateDiff(entrada.fecha, salida.fecha);
+			var horaEntrada = secondsTimeSpanToHMS(duracion);
+			badges += '<span class="badge badge-secondary">' + ' (' + entrada.codigo + ') ' + horaEntrada + '</span>'
+		}
+	});
+
+	events.badges = badges;
+	return events;
+}
+
+var drawDia = function(dia, method) {
+	var f = moment(dia.fecha);
+	var events = calculateEvents(dia.registros);
 
 	var tableRow = {
 		id: dia.id,
 		dia: f.format('DD [de] MMMM'),
-		eventos: badges,
+		eventos: events.badges,
 		total: "08:30:00",
 		acumulativo: "jijijouij",
 	}
@@ -107,22 +170,3 @@ var initTimePicker = function() {
 	$("#datetimeInput").datetimepicker(timepickerConfig);
 	$("#datetimeInput").datetimepicker('setDate', (new Date()));
 }
-
-$("#btnHoy").on('click', function(event) {
-	$("#datetimeInput").datetimepicker('setDate', (new Date()));
-});
-
-$("#btnAyer").on('click', function(event) {
-	var f = new Date();
-	f.setDate(f.getDate() - 1);
-	$("#datetimeInput").datetimepicker('setDate', f);
-});
-
-$("#btnEntrada, #btnSalida").on('click', function(event) {
-	registro = {
-		fecha: $("#datetimeInput").datetimepicker('getDate'),
-		codigo: $("#selectCode").val(),
-		tipo: ((event.target.id === "btnEntrada") ? tipos.entrada : tipos.salida)
-	}
-	addNewRegistro(registro);
-});
