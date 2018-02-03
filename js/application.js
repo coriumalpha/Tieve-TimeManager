@@ -27,8 +27,8 @@ var addNewRegistro = function(registro) {
 	var dia;
 	$.each(dias, function(key, value) {
 		//Colocamos las horas a cero para excluir el tiempo de la comparación
-		var rf = registro.fecha.setHours(0,0,0,0);
-		if (value.fecha.valueOf() === rf.valueOf()) {
+		var rf = new Date(registro.fecha);
+		if (value.fecha.valueOf() === rf.setHours(0,0,0,0).valueOf()) {
 			//El día existe en dias[] por lo que extraemos su id
 			idDia = value.id;
 			return;
@@ -37,44 +37,44 @@ var addNewRegistro = function(registro) {
 
 	if (typeof(idDia) === "undefined") {
 		//El día no existía, por lo que creamos uno nuevo
+		var rf = new Date(registro.fecha)
 		dia = {
 			id: dias.length,
-			fecha: registro.fecha.setHours(0,0,0,0),
+			fecha: rf.setHours(0,0,0,0),
 			registros: []
 		}
 		dia.registros.push(registro);
 
 		dias.push(dia);
-		drawDia(dia);
+		drawDia(dia, "insert");
 	} else {
 		dias[idDia].registros.push(registro);
-		updateDia(dias[idDia]);
+		drawDia(dias[idDia], "update");
 	}
 }
 
-var drawDia = function(dia) {
+var drawDia = function(dia, method) {
+	var badges = "";
 	var f = moment(dia.fecha);
-	var tableRow = {
-		id: dia.id,
-		dia: f.format('DD [de] MMMM'),
-		eventos: "Eventos relativos al día",
-		total: "08:30:00",
-		acumulativo: "00:00:00",
-	}
-	var row = tablaRegistros.row.add(tableRow).draw();
-}
 
-var updateDia = function(dia) {
-	//var rowData = tablaRegistros.row(dia.id).data();
-	var f = moment(dia.fecha);
+	$.each(dia.registros, function(key, value) {
+		var hora = moment(value.fecha).format("HH:mm:ss");
+		badges += '<span class="badge badge-secondary">' + literales.tipos[value.tipo] + ' ' + hora + '</span>'
+	});
+
 	var tableRow = {
 		id: dia.id,
 		dia: f.format('DD [de] MMMM'),
-		eventos: "Eventos relativos al día",
+		eventos: badges,
 		total: "08:30:00",
 		acumulativo: "jijijouij",
 	}
-	tablaRegistros.row(dia.id).data(tableRow).draw();
+
+	if (method === "insert") {
+		var row = tablaRegistros.row.add(tableRow).draw();
+	} else {
+		tablaRegistros.row(dia.id).data(tableRow).draw();
+	}
 }
 
 var initTablaRegistros = function() {
