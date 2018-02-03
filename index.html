@@ -4,25 +4,129 @@
 		<meta charset="UTF-8"> 
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.css" />
 		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
 		<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-sliderAccess.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/i18n/jquery-ui-timepicker-es.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
 		<title>Tieve</title>
+		<style type="text/css">
+			/* Sticky footer styles
+			-------------------------------------------------- */
+			html {
+			  position: relative;
+			  min-height: 100%;
+			}
+			body {
+			  /* Margin bottom by footer height */
+			  margin-bottom: 60px;
+			}
+			.footer {
+			  position: absolute;
+			  bottom: 0;
+			  width: 100%;
+			  /* Set the fixed height of the footer here */
+			  height: 60px;
+			  line-height: 60px; /* Vertically center the text there */
+			  background-color: #f5f5f5;
+			}
+
+
+			/* Custom page CSS
+			-------------------------------------------------- */
+			/* Not required for template or sticky footer method. */
+
+			body > .container {
+			  padding: 60px 15px 0;
+			}
+
+			.footer > .container {
+			  padding-right: 15px;
+			  padding-left: 15px;
+			}
+
+			code {
+			  font-size: 80%;
+			}
+		</style>
 	</head>
 	<body>
-		<input type="submit" id="btnAyer" value="Ayer">
-		<input type="submit" id="btnHoy" value="Hoy">
-		<input id="datetimeInput" />
-		<select id="selectCode">
-			<option value="1">Código 001</option>
-			<option value="6">Código 006</option>
-			<option value="7">Código 007</option>
-		</select>
-		<input type="submit" id="btnEntrada" value="Entrada">
-		<input type="submit" id="btnSalida" value="Salida">
+		<header>
+      		<div class="collapse bg-dark" id="navbarHeader">
+        		<div class="container">
+        			<div class="row">
+						<div class="col-sm-8 col-md-7 py-4">
+							<h4 class="text-white">About</h4>
+							<p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+            			</div>
+						<div class="col-sm-4 offset-md-1 py-4">
+            				<h4 class="text-white">Contact</h4>
+							<ul class="list-unstyled">
+								<li><a href="#" class="text-white">Follow on Twitter</a></li>
+								<li><a href="#" class="text-white">Like on Facebook</a></li>
+								<li><a href="#" class="text-white">Email me</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="navbar navbar-dark bg-dark box-shadow">
+				<div class="container d-flex justify-content-between">
+					<a href="#" class="navbar-brand d-flex align-items-center">
+						<strong>Tieve</strong>
+          			</a>
+          			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+            			<span class="navbar-toggler-icon"></span>
+          			</button>
+				</div>
+			</div>
+    	</header>
+	    <main class="container" role="main">
+		    <div class="py-4">
+				<div class="container">
+					<div class="row">
+						<div class="col-12">
+							<!--form-->
+							<div class="row">
+								<div class="form-group col-4">
+									<select class="form-control" id="selectCode">
+										<option value="1">Código 001</option>
+										<option value="6">Código 006</option>
+										<option value="7">Código 007</option>
+									</select>
+								</div>
+								<div class="form-group col-6">
+									<input class="form-control" id="datetimeInput" />
+								</div>
+								<div class="form-group col-2">
+									<div class="btn-group d-flex" role="group" aria-label="Basic example">
+										<button id="btnAyer" type="button" class="btn w-100">Ayer</button>
+										<button id="btnHoy" type="button" class="btn w-100">Hoy</button>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="form-group col-12">
+									<div class="btn-group d-flex" role="group">
+										<button id="btnEntrada" type="button" class="btn w-100">Entrada</button>
+										<button id="btnSalida" type="button" class="btn w-100">Salida</button>
+									</div>
+								</div>
+							</div>
+							<!--/form-->
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="footer">
+			<div class="container">
+				<span class="text-muted">Muy sin más el sticky footer...</span>
+			</div>
+		</footer>
 	</body>
 	<script type="text/javascript">
 		var registros = []
