@@ -51,15 +51,16 @@ var calculateEvents = function(registros) {
 
 	$.each(registrosEntrada, function(key, entrada) {
 		var posiblesSalidas = $.grep(registros, function(value) {
-			return value.codigo === entrada.codigo && value.tipo === tipos.salida;
+			return value.codigo === entrada.codigo && value.tipo === tipos.salida && (getDateDiff(entrada.fecha, value.fecha) > 0);
 		});
 
 		if (posiblesSalidas.length == 0) {
 			//Sólo hay entrada, badge de entrar!
 			var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
-			badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + '">' + literales.tipos[entrada.tipo] + ' ' + literales.codigos[entrada.codigo] + ' ' + horaEntrada + '</span>'
+			badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + ' w-100">' + literales.tipos[entrada.tipo] + ' ' + horaEntrada + '</span>'
 		} else {
 			//Encontrar el más cercano y hacer badge de entrada-salida con él
+			var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
 			var minDuration;
 			var salida;
 
@@ -78,9 +79,10 @@ var calculateEvents = function(registros) {
 				console.log(minDuration);
 			});
 
-			var duracion = getDateDiff(entrada.fecha, salida.fecha);
-			var horaEntrada = secondsTimeSpanToHMS(duracion);
-			badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + '">' + literales.codigos[entrada.codigo] + ' ' + horaEntrada + '</span>'
+			var duracionSec = getDateDiff(entrada.fecha, salida.fecha);
+			var duracion = secondsTimeSpanToHMS(duracionSec);
+			var horaSalida = moment(salida.fecha).format("HH:mm:ss");
+			badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + ' w-100">' + ' <i class="fas fa-fw fa-stopwatch ml-1"></i>' + ' ' + duracion + ' <i class="fas fa-fw fa-play"></i>' + ' ' + horaEntrada + ' <i class="fas fa-fw fa-stop"></i>' + ' ' + horaSalida + '</span>'
 		}
 	});
 
@@ -96,8 +98,7 @@ var drawDia = function(dia, method) {
 		id: dia.id,
 		dia: f.format('DD [de] MMMM'),
 		eventos: events.badges,
-		total: "08:30:00",
-		acumulativo: "jijijouij",
+		acumulativo: '<span class="badge badge-dark w-100"><i class="far fa-clock mr-1"></i> 0:02:17 <i class="fas fa-history mr-1 ml-1"></i> 3:14:15</span>',
 	}
 
 	if (method === "insert") {
@@ -120,7 +121,6 @@ var initTablaRegistros = function() {
 		columns: [
 			{data: "dia"},
 			{data: "eventos"},
-			{data: "total"},
 			{data: "acumulativo"},
 		]
 	}			

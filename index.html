@@ -20,6 +20,7 @@
 		<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/locale/es.js"></script>
+		<script src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 		
 		<title>Tieve</title>
 	</head>
@@ -61,29 +62,47 @@
 						<div class="col-12">
 							<!--form-->
 							<div class="row">
-								<div class="form-group col-4">
-									<select class="form-control selectpicker" id="selectCode">
-										<option value="1">C1 Jornada</option>
-										<option value="6">C3 Almuerzo</option>
-										<option value="6">C6 Vapeo</option>
-										<option value="7">C7 Comida</option>
-									</select>
+								<div class="form-group col-md-4 col-sm-12">
+									<div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
+										<label class="btn btn-light w-100 active">
+											<input type="radio" name="selectCode" value="1" id="selectCode1" autocomplete="off" checked>
+											<i class="fas fa-briefcase"></i>
+										</label>
+										<label class="btn btn-success w-100">
+											<input type="radio" name="selectCode" value="3" id="selectCode3" autocomplete="off">
+											<i class="fas fa-coffee"></i>
+										</label>
+										<label class="btn btn-info w-100">
+											<input type="radio" name="selectCode" value="6" id="selectCode6" autocomplete="off">
+											<i class="fas fa-cloud"></i>
+										</label>
+										<label class="btn btn-danger w-100">
+											<input type="radio" name="selectCode" value="7" id="selectCode7" autocomplete="off">
+											<i class="fas fa-utensils"></i>
+										</label>
+									</div>
 								</div>
-								<div class="form-group col-6">
+								<div class="form-group col-md-6 col-sm-12">
 									<input class="form-control" id="datetimeInput" />
 								</div>
-								<div class="form-group col-2">
+								<div class="form-group col-md-2 hidden-md-down">
 									<div class="btn-group d-flex" role="group" aria-label="Basic example">
 										<button id="btnAyer" type="button" class="btn w-100">Ayer</button>
-										<button id="btnHoy" type="button" class="btn w-100">Hoy</button>
+										<button id="btnHoy" type="button" class="btn w-100">Ahora</button>
 									</div>
 								</div>
 							</div>
-							<div class="row">
-								<div class="form-group col-12">
+							<div class="row justify-content-md-center pt-3">
+								<div class="form-group col-md-8 col-sm-12">
 									<div class="btn-group d-flex" role="group">
-										<button id="btnEntrada" type="button" class="btn w-100">Entrada</button>
-										<button id="btnSalida" type="button" class="btn w-100">Salida</button>
+										<button id="btnInicio" type="button" class="btn btn-success w-100">
+											<span class="float-left"><i class="fa fa-fw fa-play" aria-hidden="true"></i></span>   
+                        					<span>Inicio</span>
+										</button>
+										<button id="btnFin" type="button" class="btn btn-danger w-100">
+											<span class="float-left"><i class="fa fa-fw fa-stop" aria-hidden="true"></i></span>   
+                        					<span>Fin</span>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -91,14 +110,13 @@
 						</div>
 					</div>
 
-					<div class="row pt-4">
+					<div class="row pt-2">
 						<div class="col-12">
 							<table class="table" id="tablaRegistros">
-								<thead class="thead-dark">
+								<thead class="thead-light thead-sm">
 									<tr>
 										<th scope="col">Día</th>
 										<th scope="col">Eventos</th>
-										<th scope="col">Total (+diff)</th>
 										<th scope="col">Acumulativo</th>
 									</tr>
 								</thead>

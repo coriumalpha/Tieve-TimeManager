@@ -5,22 +5,22 @@ var tipos = {
 
 var literales = {
 	tipos : {
-		0: "Salida",
-		1: "Entrada",
+		0: '<i class="fas fa-fw fa-stop mr-1 ml-1"></i>',
+		1: '<i class="fas fa-fw fa-play mr-1 ml-1"></i>',
 	},
 	codigos: {
-		1: "Jornada",
-		3: "Almuerzo",
-		6: "Código 6",
-		7: "Comida",
+		1: '<i class="fas fa-fw fa-briefcase"></i>',
+		3: '<i class="fas fa-fw fa-coffee"></i>',
+		6: '<i class="fas fa-fw fa-cloud"></i>',
+		7: '<i class="fas fa-fw fa-utensils"></i>',
 	}
 }
 
 var codigosLabel = {
-	1: "primary",
+	1: "light",
 	3: "success",
-	6: "warning",
-	7: "info",
+	6: "info",
+	7: "danger",
 }
 
 var getDateDiff = function(date1, date2) {
