@@ -14,6 +14,7 @@ $(function () {
 var drawFromLocal = function () {
     var logs = JSON.parse(localStorage.getItem('registros'))
     $.each(logs, function (key, value) {
+        value.fecha = new Date(value.fecha);
         addNewRegistro(value);
     });
 }
