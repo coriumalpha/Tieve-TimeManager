@@ -9,7 +9,7 @@ var literales = {
 		1: '<i class="fas fa-fw fa-play mr-1 ml-1"></i>',
 	},
 	codigos: {
-		1: '<i class="fas fa-fw fa-briefcase"></i>',
+		0: '<i class="fas fa-fw fa-briefcase"></i>',
 		3: '<i class="fas fa-fw fa-coffee"></i>',
 		6: '<i class="fas fa-fw fa-cloud"></i>',
 		7: '<i class="fas fa-fw fa-utensils"></i>',
@@ -17,7 +17,7 @@ var literales = {
 }
 
 var codigosLabel = {
-	1: "light",
+	0: "light",
 	3: "danger",
 	6: "info",
 	7: "success",
