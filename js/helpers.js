@@ -18,9 +18,9 @@ var literales = {
 
 var codigosLabel = {
 	1: "light",
-	3: "success",
+	3: "danger",
 	6: "info",
-	7: "danger",
+	7: "success",
 }
 
 var getDateDiff = function(date1, date2) {
