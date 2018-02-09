@@ -5,7 +5,6 @@ var dias = [];
 //Llamadas a funciones tras carga del documento web
 $(function () {
     moment().locale('es');
-    console.log('moment locale set to: ' + moment.locale());
     initTimePicker();
     initTablaRegistros();
     drawFromLocal();
