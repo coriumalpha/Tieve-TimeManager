@@ -13,6 +13,7 @@ $(function () {
 var drawFromLocal = function () {
     var logs = JSON.parse(localStorage.getItem('registros'))
     $.each(logs, function (key, value) {
+    	//Revivir la fecha, viene en texto plano
         value.fecha = new Date(value.fecha);
         addNewRegistro(value);
     });
@@ -23,6 +24,12 @@ var addNewRegistro = function (registro) {
     var dia;
 
     registros.push(registro);
+    //Ordenar registros
+    registros.sort(function(a, b) {
+    	var dateA = new Date(a.fecha);
+    	var dateB = new Date(b.fecha);
+    	return dateA - dateB;
+    });
     localStorage.setItem('registros', JSON.stringify(registros))
 
     $.each(dias, function (key, value) {
@@ -44,17 +51,23 @@ var addNewRegistro = function (registro) {
             registros: []
         }
         dia.registros.push(registro);
-
         dias.push(dia);
         drawDia(dia, "insert");
     } else {
         dias[idDia].registros.push(registro);
+        dias[idDia].registros.sort(function(a, b) {
+	    	var dateA = new Date(a.fecha);
+	    	var dateB = new Date(b.fecha);
+	    	return dateA - dateB;
+    	});
         drawDia(dias[idDia], "update");
     }
 }
 
 var calculateEvents = function (registros) {
     var events = {};
+    //Almacenará la diferencia en segundos (en negativo si se debe tiempo)
+    events.diferencia = 0;
     var badges = "";
 
     var registrosEntrada = $.grep(registros, function (value) {
@@ -87,11 +100,11 @@ var calculateEvents = function (registros) {
                     minDuration = dateDiff;
                     salida = posibleSalida;
                 }
-                console.log(minDuration);
             });
 
             var duracionSec = getDateDiff(entrada.fecha, salida.fecha);
             var duracion = secondsTimeSpanToHMS(duracionSec);
+            events.diferencia += calculateEventDifference(entrada.codigo, duracionSec, entrada.fecha);
             var horaSalida = moment(salida.fecha).format("HH:mm:ss");
             badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + ' w-100">' + ' <i class="fas fa-fw fa-stopwatch ml-1"></i>' + ' ' + duracion + ' <i class="fas fa-fw fa-play"></i>' + ' ' + horaEntrada + ' <i class="fas fa-fw fa-stop"></i>' + ' ' + horaSalida + '</span>'
         }
@@ -101,15 +114,64 @@ var calculateEvents = function (registros) {
     return events;
 }
 
+var calculateEventDifference = function (codigo, duracion, fecha) {
+	var diferencia;
+	var dow = new Date(fecha).getDay();
+
+	switch(codigo) {
+		case "0": 
+			if (dow == 5) {
+				diferencia = (tiempos.jornada.intensiva * 60) - duracion;
+				break;
+			}
+			diferencia = (tiempos.jornada.normal * 60) - duracion;
+			break;
+		case "1":
+			if (duracion <= (tiempos.eventos[codigo] * 60)) {
+				diferencia = 0;
+			} else {
+				diferencia = duracion - (tiempos.eventos[codigo] * 60); 
+			}
+			break;
+		case "6":
+			diferencia = duracion;
+			break;
+		case "7":
+			if (duracion <= (tiempos.eventos[codigo] * 60)) {
+				diferencia = (tiempos.eventos[codigo] * 60);
+			} else {
+				diferencia = duracion;
+			}
+			break;
+	}
+
+	return diferencia;
+}
+
 var drawDia = function (dia, method) {
     var f = moment(dia.fecha);
-    var events = calculateEvents(dia.registros);
+    dia.eventos = {};
+    dia.eventos = calculateEvents(dia.registros);
+    var diferenciaPuntual = secondsTimeSpanToHMS(dia.eventos.diferencia * (-1));
+    
+    var diasPrevios = $.grep(dias, function(value, key) {
+    	var fecha = new Date(value.fecha);
+    	var diaActual = new Date(dia.fecha);
+    	return fecha < diaActual;
+    });
+    var diferenciaTotal = 0;
+
+    $.each(diasPrevios, function(key, value) {
+    	diferenciaTotal += value.eventos.diferencia;
+    });
+
+    diferenciaTotal = secondsTimeSpanToHMS((diferenciaTotal + dia.eventos.diferencia) * (-1));
 
     var tableRow = {
         id: dia.id,
         dia: f.format('DD [de] MMMM'),
-        eventos: events.badges,
-        acumulativo: '<span class="badge badge-dark w-100"><i class="far fa-clock mr-1"></i> 0:02:17 <i class="fas fa-history mr-1 ml-1"></i> 3:14:15</span>',
+        eventos: dia.eventos.badges,
+        acumulativo: '<span class="badge badge-dark w-100"><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + '</span>',
     }
 
     if (method === "insert") {

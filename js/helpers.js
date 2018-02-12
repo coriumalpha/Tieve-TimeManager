@@ -3,6 +3,18 @@ var tipos = {
 	salida: 0
 }
 
+var tiempos = {
+	jornada: {
+		normal: 510,
+		intensiva: 411
+	},
+	eventos: {
+		1: 15,
+		6: 6,
+		7: 30,
+	}
+}
+
 var literales = {
 	tipos : {
 		0: '<i class="fas fa-fw fa-stop mr-1 ml-1"></i>',
@@ -39,9 +51,14 @@ var getDateDiff = function(date1, date2) {
 }
 
 var secondsTimeSpanToHMS = function(s) {
+	var negative = false;
+	if (s < 0) {
+		s = s * (-1);
+		negative = true;
+	}
     var h = Math.floor(s/3600); //Obtener horas enteras
     s -= h*3600;
     var m = Math.floor(s/60); //Obtener minutos enteros
     s -= m*60;
-    return h+":"+(m < 10 ? '0'+m : m)+":"+(s < 10 ? '0'+s : s); //Añadir cero precedente a minutos y segundos
+    return ((negative) ? '- ' : '') + h + ":" + (m < 10 ? '0'+m : m) + ":" + (s < 10 ? '0'+s : s); //Añadir cero precedente a minutos y segundos
 }
