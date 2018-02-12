@@ -86,9 +86,9 @@ var conformarBadge = function(data) {
     if (typeof data.salida !== "undefined") {
 		var horaSalida = moment(data.salida).format("HH:mm:ss");
 	    var horaSalidaCorta = moment(data.salida).format("HH:mm");
-    	var title = 'Entrada: ' + horaEntrada;
+    	var title = 'De ' + horaEntrada + ' a ' + horaSalida;
     } else {
-	    var title = 'De ' + horaEntrada + ' a ' + horaSalida;
+    	var title = 'Entrada: ' + horaEntrada;
     }
 	
 
