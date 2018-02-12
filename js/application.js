@@ -79,13 +79,18 @@ var calculateEvents = function (registros) {
             return value.codigo === entrada.codigo && value.tipo === tipos.salida && (getDateDiff(entrada.fecha, value.fecha) > 0);
         });
 
+        var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
+        var horaEntradaCorta = moment(entrada.fecha).format("HH:mm");
+
         if (posiblesSalidas.length == 0) {
             //Sólo hay entrada, badge de entrar!
-            var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
-            badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + ' w-100">' + literales.tipos[entrada.tipo] + ' ' + horaEntrada + '</span>'
+            var badge = {
+        		claseCodigo: codigosLabel[entrada.codigo],
+        		entrada: entrada.fecha,
+        	}
+        	badges += conformarBadge(badge);
         } else {
             //Encontrar el más cercano y hacer badge de entrada-salida con él
-            var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
             var minDuration;
             var salida;
 
@@ -104,9 +109,16 @@ var calculateEvents = function (registros) {
 
             var duracionSec = getDateDiff(entrada.fecha, salida.fecha);
             var duracion = secondsTimeSpanToHMS(duracionSec);
+            //Ir incrementando diferencia del día según van entrando nuevos registros, basándose en el código
             events.diferencia += calculateEventDifference(entrada.codigo, duracionSec, entrada.fecha);
-            var horaSalida = moment(salida.fecha).format("HH:mm:ss");
-            badges += '<span class="badge badge-' + codigosLabel[entrada.codigo] + ' w-100">' + ' <i class="fas fa-fw fa-stopwatch ml-1"></i>' + ' ' + duracion + ' <i class="fas fa-fw fa-play"></i>' + ' ' + horaEntrada + ' <i class="fas fa-fw fa-stop"></i>' + ' ' + horaSalida + '</span>'
+
+            var badge = {
+        		claseCodigo: codigosLabel[entrada.codigo],
+        		duracion: duracion,
+        		entrada: entrada.fecha,
+        		salida: salida.fecha,
+        	}
+        	badges += conformarBadge(badge);
         }
     });
 
@@ -171,7 +183,7 @@ var drawDia = function (dia, method) {
         id: dia.id,
         dia: f.format('DD [de] MMMM'),
         eventos: dia.eventos.badges,
-        acumulativo: '<span class="badge badge-dark w-100"><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + '</span>',
+        acumulativo: '<span class="badge badge-dark w-100" title="  "><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + '</span>',
     }
 
     if (method === "insert") {

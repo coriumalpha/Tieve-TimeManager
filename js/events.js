@@ -1,9 +1,9 @@
-$("#btnHoy").on('click', function(event) {
+$("#btnAhora").on('click', function(event) {
 	$("#datetimeInput").datetimepicker('setDate', (new Date()));
 });
 
-$("#btnAyer").on('click', function(event) {
-	var f = new Date();
+$("#btnRestar").on('click', function(event) {
+	var f = $("#datetimeInput").datetimepicker('getDate');
 	f.setDate(f.getDate() - 1);
 	$("#datetimeInput").datetimepicker('setDate', f);
 });

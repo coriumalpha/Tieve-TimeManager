@@ -62,44 +62,42 @@
 							<div class="row">
 								<div class="form-group col-md-4 col-sm-12">
 									<div class="btn-group btn-group-toggle d-flex" data-toggle="buttons">
-										<label class="btn btn-light w-100 active">
+										<label class="btn btn-light text-secondary w-100 active">
 											<input type="radio" name="selectCode" value="0" id="selectCode0" autocomplete="off" checked>
 											<i class="fas fa-briefcase"></i>
 										</label>
-										<label class="btn btn-info w-100">
+										<label class="btn btn-light text-info w-100">
 											<input type="radio" name="selectCode" value="6" id="selectCode6" autocomplete="off">
 											<i class="fas fa-cloud"></i>
 										</label>
-										<label class="btn btn-success w-100">
+										<label class="btn btn-light text-success w-100">
 											<input type="radio" name="selectCode" value="7" id="selectCode7" autocomplete="off">
 											<i class="fas fa-utensils"></i>
 										</label>
-										<label class="btn btn-danger w-100">
+										<label class="btn btn-light text-danger w-100">
 											<input type="radio" name="selectCode" value="1" id="selectCode1" autocomplete="off">
 											<i class="fas fa-coffee"></i>
 										</label>
 									</div>
 								</div>
-								<div class="form-group col-md-6 col-sm-12">
-									<input class="form-control" id="datetimeInput" />
-								</div>
-								<div class="form-group col-md-2 hidden-md-down">
-									<div class="btn-group d-flex" role="group" aria-label="Basic example">
-										<button id="btnAyer" type="button" class="btn w-100">Ayer</button>
-										<button id="btnHoy" type="button" class="btn w-100">Ahora</button>
+								<div class="input-group col-md-6 col-sm-12">
+									<div class="input-group mb-3">
+										<div class="input-group-prepend">
+											<button id="btnRestar" class="btn btn-light text-secondary" type="button"><i class="fas fa-minus"></i></button>
+										</div>
+										<input id="datetimeInput" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+										<div class="input-group-append">
+											<button id="btnAhora" class="btn btn-light text-secondary" type="button"><i class="fas fa-clock"></i></button>
+										</div>
 									</div>
 								</div>
-							</div>
-							<div class="row justify-content-md-center pt-3">
-								<div class="form-group col-md-8 col-sm-12">
+								<div class="form-group col-md-2 hidden-md-down">
 									<div class="btn-group d-flex" role="group">
-										<button id="btnInicio" type="button" class="btn btn-success w-100">
-											<span class="float-left"><i class="fa fa-fw fa-play" aria-hidden="true"></i></span>   
-                        					<span>Inicio</span>
+										<button id="btnInicio" type="button" class="btn btn-light w-100">
+											<span class="text-success"><i class="fa fa-fw fa-play" aria-hidden="true"></i></span>	 
 										</button>
-										<button id="btnFin" type="button" class="btn btn-danger w-100">
-											<span class="float-left"><i class="fa fa-fw fa-stop" aria-hidden="true"></i></span>   
-                        					<span>Fin</span>
+										<button id="btnFin" type="button" class="btn btn-light w-100">
+											<span class="text-danger"><i class="fa fa-fw fa-stop" aria-hidden="true"></i></span>	 
 										</button>
 									</div>
 								</div>

@@ -60,5 +60,51 @@ var secondsTimeSpanToHMS = function(s) {
     s -= h*3600;
     var m = Math.floor(s/60); //Obtener minutos enteros
     s -= m*60;
-    return ((negative) ? '- ' : '') + h + ":" + (m < 10 ? '0'+m : m) + ":" + (s < 10 ? '0'+s : s); //Añadir cero precedente a minutos y segundos
+    return ((negative) ? '- ' : '') + ((h == 0) ? '' : h + "h ") + (m < 10 ? '0'+m : m) + "\' " + (s < 10 ? '0'+s : s) + '\"'; //Añadir cero precedente a minutos y segundos
+}
+
+var secondsTimeSpanToHM = function(s) {
+	var negative = false;
+	if (s < 0) {
+		s = s * (-1);
+		negative = true;
+	}
+    var h = Math.floor(s/3600); //Obtener horas enteras
+    s -= h*3600;
+    var m = Math.floor(s/60); //Obtener minutos enteros
+    s -= m*60;
+    return ((negative) ? '- ' : '') + h + ":" + (m < 10 ? '0'+m : m); //Añadir cero precedente a minutos y segundos
+}
+
+var conformarBadge = function(data) {
+    var horaEntrada = moment(data.entrada).format("HH:mm:ss");
+    var horaEntradaCorta = moment(data.entrada).format("HH:mm");
+
+
+	//var clases = 'd-flex justify-content-around badge badge-' + data.claseCodigo + ' w-100 my-1';
+    var clases = 'badge badge-' + data.claseCodigo + ' w-100 my-1';
+    if (typeof data.salida !== "undefined") {
+		var horaSalida = moment(data.salida).format("HH:mm:ss");
+	    var horaSalidaCorta = moment(data.salida).format("HH:mm");
+    	var title = 'Entrada: ' + horaEntrada;
+    } else {
+	    var title = 'De ' + horaEntrada + ' a ' + horaSalida;
+    }
+	
+
+	var badge = '<span class="' + clases + '" title="' + title + '">';
+	badge += 		'<div class="row">'
+	badge += 			'<div class="col-sm-4 m-auto">';
+	badge += 				(typeof data.salida !== "undefined") ? '<span class="m-auto"><i class="fas fa-fw fa-stopwatch ml-1"></i> ' + data.duracion + '</span>' : '';
+	badge += 			'</div>';
+	badge += 			'<div class="col-sm-4 m-auto">';
+	badge += 				'<span class="m-auto"><i class="fas fa-fw fa-play"></i> ' + horaEntradaCorta + '</span>';
+	badge += 			'</div>';
+	badge += 			'<div class="col-sm-4 m-auto">';
+	badge += 				(typeof data.salida !== "undefined") ? '<span class="m-auto"><i class="fas fa-fw fa-stop"></i> ' + horaSalidaCorta + '</span>' : '';
+	badge += 			'</div>';
+	badge += 		'</div>';
+	badge += '</span>';
+
+	return badge;
 }
