@@ -188,6 +188,7 @@ var initTablaRegistros = function () {
         select: false,
         paging: false,
         info: false,
+        order: [0, 'desc'],
         language: {
             emptyTable: "No hay registros que mostrar.",
         },
