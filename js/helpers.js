@@ -108,3 +108,41 @@ var conformarBadge = function(data) {
 
 	return badge;
 }
+
+var hParser = function (entry, fecha) {
+    var evento = {};
+    
+    evento.tipo = (entry.substring(0, 1) == "E" || entry.substring(0, 1) == "i") ? tipos.entrada : tipos.salida;
+
+    var fechaEvento = new Date(fecha);
+    fechaEvento.setHours(entry.substring(2, 4));
+    fechaEvento.setMinutes(entry.substring(5, 7));
+    fechaEvento.setSeconds(entry.substring(8, 10));
+    evento.codigo = entry.substring(13);
+
+    evento.fecha = fechaEvento;
+    return evento;
+}
+
+var dParser = function (rawEntries) {
+    var entries = rawEntries.split('\n');
+
+    var dayEntries = [];
+    var d;
+
+    $.each(entries, function (key, value) {
+        value = value.trim();
+        var protoDate = value.split("/");
+        if (protoDate.length == 3) {
+            d = new Date(protoDate[2], protoDate[1] - 1, protoDate[0]);
+        } else {
+            dayEntries.push(hParser(value, d));
+        }
+    });
+
+    $.each(dayEntries, function (key, value) {
+        addNewRegistro(value);
+    })
+    
+    return
+}
