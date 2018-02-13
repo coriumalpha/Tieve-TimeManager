@@ -16,3 +16,7 @@ $("#btnInicio, #btnFin").on('click', function(event) {
 	}
 	addNewRegistro(registro);
 });
+
+$("#btnBulkInsert").on('click', function(event) {
+    dParser($("#bulkInsert").val());
+});
