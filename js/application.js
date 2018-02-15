@@ -181,7 +181,7 @@ var drawDia = function (dia, method) {
 
     var tableRow = {
         id: dia.id,
-        dia: f.format('DD [de] MMMM'),
+        dia: f.format('YYYY-MM-DD'),
         eventos: dia.eventos.badges,
         acumulativo: '<span class="badge badge-dark w-100" title="  "><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + '</span>',
     }

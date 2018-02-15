@@ -18,5 +18,6 @@ $("#btnInicio, #btnFin").on('click', function(event) {
 });
 
 $("#btnBulkInsert").on('click', function(event) {
-    dParser($("#bulkInsert").val());
+    localStorage.clear();
+	dParser($("#bulkInsert").val());
 });
