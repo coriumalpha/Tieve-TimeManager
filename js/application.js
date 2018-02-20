@@ -194,6 +194,9 @@ var drawDia = function (dia, method) {
 }
 
 var initTablaRegistros = function () {
+	if ($.fn.DataTable.isDataTable('#tablaRegistros')) {
+            $('#tablaRegistros').DataTable().destroy();
+        }
     var tableConfig = {
         rowId: 'id',
         searching: false,

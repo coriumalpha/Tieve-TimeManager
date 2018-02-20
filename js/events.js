@@ -18,6 +18,13 @@ $("#btnInicio, #btnFin").on('click', function(event) {
 });
 
 $("#btnBulkInsert").on('click', function(event) {
-    localStorage.clear();
+	localStorage.clear();
 	dParser($("#bulkInsert").val());
+});
+
+$("#btnFullWipe").on('click', function(event) {
+	localStorage.clear();
+	dias = [];
+	registros = [];
+	initTablaRegistros();
 });
