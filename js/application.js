@@ -165,25 +165,46 @@ var drawDia = function (dia, method) {
     dia.eventos = {};
     dia.eventos = calculateEvents(dia.registros);
     var diferenciaPuntual = secondsTimeSpanToHMS(dia.eventos.diferencia * (-1));
-    
+		
     var diasPrevios = $.grep(dias, function(value, key) {
     	var fecha = new Date(value.fecha);
     	var diaActual = new Date(dia.fecha);
     	return fecha < diaActual;
     });
     var diferenciaTotal = 0;
+	var diferenciaTotalSegundos = 0;
 
     $.each(diasPrevios, function(key, value) {
-    	diferenciaTotal += value.eventos.diferencia;
+    	diferenciaTotalSegundos += value.eventos.diferencia;
     });
 
-    diferenciaTotal = secondsTimeSpanToHMS((diferenciaTotal + dia.eventos.diferencia) * (-1));
+    diferenciaTotal = secondsTimeSpanToHMS((diferenciaTotalSegundos + dia.eventos.diferencia) * (-1));
 
+	dia.registros.sort(function(a, b) {
+    	var dateA = new Date(a.fecha);
+    	var dateB = new Date(b.fecha);
+    	return dateA - dateB;
+    });
+	
+	var entradasDia = $.grep(dia.registros, function(value) {
+		return value.tipo === tipos.entrada;
+	});
+	
+	var salidaEstimada = 0;
+	
+	if (entradasDia.length > 0) {
+		var primeraEntrada = entradasDia[0];
+		var dow = new Date(primeraEntrada.fecha).getDay();
+		var duracionJornada = (dow == 5) ? tiempos.jornada.intensiva : (tiempos.jornada.normal + tiempos.eventos[7]);
+		var compensacion = (diferenciaTotalSegundos < (15 * 60)) ? ((diferenciaTotalSegundos < (5 * 60)) ? 0 : 5) : 15;
+		var salidaEstimada = moment(primeraEntrada.fecha).add((duracionJornada * 60) + dia.eventos.diferencia + (compensacion * 60), 'seconds').format("HH:mm")
+	}
+	
     var tableRow = {
         id: dia.id,
         dia: f.format('YYYY-MM-DD'),
         eventos: dia.eventos.badges,
-        acumulativo: '<span class="badge badge-dark w-100" title="  "><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + '</span>',
+        acumulativo: '<span class="badge badge-dark w-100" title="  "><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + ' <i class="fas fa-sign-out-alt mr-1 ml-1"></i>' + salidaEstimada + '</span>',
     }
 
     if (method === "insert") {
