@@ -10,8 +10,22 @@ $(function () {
     drawFromLocal();
 });
 
-var deleteBadge = function (idEntrada, idSalida) {
-	confirm(idEntrada + ' - ' + idSalida);
+var deleteBadge = function (listaIds) {
+	var copiaRegistros = registros;
+	
+	$.each(listaIds, function(key, value) {
+		copiaRegistros = $.grep(copiaRegistros, function(registro) {
+			return registro.id !== parseInt(value);
+		});
+	});
+
+	localStorage.setItem('registros', JSON.stringify(copiaRegistros));
+
+	//TODO Arreglar esta basurilla
+	registros.length = 0;
+	dias.length = 0;
+
+	$.when(initTablaRegistros()).done(drawFromLocal());
 }
 
 var drawFromLocal = function () {
@@ -237,19 +251,24 @@ var drawDia = function (dia, method) {
     //TODO: Arreglar esta guarrada, por el amor de Diorr
     $("#tablaRegistros .editableItem").unbind().click(function (event) {
 		var target = event.target.closest(".editableItem")
-		var idEntrada = $(target).attr('identrada');
-		var idSalida;
-		if ($(target).attr('idsalida') !== "undefined") {
-			idSalida = $(target).attr('idsalida');
-		}
+		
+		var listaIds = [];
 
-		alert(idEntrada + ' - ' + idSalida);
+		listaIds.push($(target).attr('identrada'));
+		if ($(target).attr('idsalida') !== "undefined") {
+			listaIds.push($(target).attr('idsalida'));
+		}
+		if (confirm('Se va a eliminar una entrada')) {
+			deleteBadge(listaIds);	
+		}
 	});
 }
 
 var initTablaRegistros = function () {
+	var dfd = jQuery.Deferred();
+
 	if ($.fn.DataTable.isDataTable('#tablaRegistros')) {
-            $('#tablaRegistros').DataTable().destroy();
+            $('#tablaRegistros').DataTable().clear().destroy();
         }
     var tableConfig = {
         rowId: 'id',
@@ -265,9 +284,14 @@ var initTablaRegistros = function () {
             { data: "dia" },
             { data: "eventos" },
             { data: "acumulativo" },
-        ]
+        ],
+        fnInitComplete: function(oSettings, json) {
+	     	dfd.resolve();
+	    }
     }
     tablaRegistros = $("#tablaRegistros").DataTable(tableConfig);
+
+    return dfd.promise();
 }
 
 //Establecimiento de configuración e inicialización del datepicker
