@@ -10,6 +10,10 @@ $(function () {
     drawFromLocal();
 });
 
+var deleteBadge = function (idEntrada, idSalida) {
+	confirm(idEntrada + ' - ' + idSalida);
+}
+
 var drawFromLocal = function () {
     var logs = JSON.parse(localStorage.getItem('registros'))
     $.each(logs, function (key, value) {
@@ -22,6 +26,15 @@ var drawFromLocal = function () {
 var addNewRegistro = function (registro) {
     var idDia;
     var dia;
+
+    if (registros.length == 0) {
+    	registro.id = 1;
+    } else {
+    	var orderedByIdDesc = registros.sort(function(r1, r2) {
+    		return r2 - r1;
+    	});
+    	registro.id = orderedByIdDesc[0].id + 1;
+    }
 
     registros.push(registro);
     //Ordenar registros
@@ -87,6 +100,7 @@ var calculateEvents = function (registros) {
             var badge = {
         		claseCodigo: codigosLabel[entrada.codigo],
         		entrada: entrada.fecha,
+        		idEntrada: entrada.id,
         	}
         	badges += conformarBadge(badge);
         } else {
@@ -117,6 +131,8 @@ var calculateEvents = function (registros) {
         		duracion: duracion,
         		entrada: entrada.fecha,
         		salida: salida.fecha,
+        		idEntrada: entrada.id,
+        		idSalida: salida.id,
         	}
         	badges += conformarBadge(badge);
         }
@@ -199,12 +215,17 @@ var drawDia = function (dia, method) {
 		var compensacion = (diferenciaTotalSegundos < (15 * 60)) ? ((diferenciaTotalSegundos < (5 * 60)) ? 0 : 5) : 15;
 		var salidaEstimada = moment(primeraEntrada.fecha).add((duracionJornada * 60) + dia.eventos.diferencia + (compensacion * 60), 'seconds').format("HH:mm")
 	}
-	
+
     var tableRow = {
         id: dia.id,
         dia: f.format('YYYY-MM-DD'),
         eventos: dia.eventos.badges,
-        acumulativo: '<span class="badge badge-dark w-100" title="  "><i class="far fa-clock mr-1"></i> ' + diferenciaPuntual + ' <i class="fas fa-history mr-1 ml-1"></i>' + diferenciaTotal + ' <i class="fas fa-sign-out-alt mr-1 ml-1"></i>' + salidaEstimada + '</span>',
+        acumulativo: conformarBadge({
+        	tiempoTotal: diferenciaTotal,
+        	tiempoParcial: diferenciaPuntual,
+        	salidaEstimada: salidaEstimada,
+        	acumulativo: true,
+        }),
     }
 
     if (method === "insert") {
@@ -212,6 +233,18 @@ var drawDia = function (dia, method) {
     } else {
         tablaRegistros.row(dia.id).data(tableRow).draw();
     }
+
+    //TODO: Arreglar esta guarrada, por el amor de Diorr
+    $("#tablaRegistros .editableItem").unbind().click(function (event) {
+		var target = event.target.closest(".editableItem")
+		var idEntrada = $(target).attr('identrada');
+		var idSalida;
+		if ($(target).attr('idsalida') !== "undefined") {
+			idSalida = $(target).attr('idsalida');
+		}
+
+		alert(idEntrada + ' - ' + idSalida);
+	});
 }
 
 var initTablaRegistros = function () {

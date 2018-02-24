@@ -77,12 +77,31 @@ var secondsTimeSpanToHM = function(s) {
 }
 
 var conformarBadge = function(data) {
+	if (typeof data.acumulativo !== "undefined") {
+
+		var badge = '<span class="badge badge-dark w-100 my-1">';
+		badge += 		'<div class="row">'
+		badge += 			'<div class="col-sm-4 m-auto">';
+		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-clock ml-1"></i> ' + data.tiempoTotal + '</span>';
+		badge += 			'</div>';
+		badge += 			'<div class="col-sm-4 m-auto">';
+		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-history"></i> ' + data.tiempoParcial + '</span>';
+		badge += 			'</div>';
+		badge += 			'<div class="col-sm-4 m-auto">';
+		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-sign-out-alt"></i> ' + data.salidaEstimada + '</span>';
+		badge += 			'</div>';
+		badge += 		'</div>';
+		badge += '</span>';
+
+		return badge;
+	}
+
     var horaEntrada = moment(data.entrada).format("HH:mm:ss");
     var horaEntradaCorta = moment(data.entrada).format("HH:mm");
 
 
 	//var clases = 'd-flex justify-content-around badge badge-' + data.claseCodigo + ' w-100 my-1';
-    var clases = 'badge badge-' + data.claseCodigo + ' w-100 my-1';
+    var clases = 'badge badge-' + data.claseCodigo + ' w-100 my-1 editableItem';
     if (typeof data.salida !== "undefined") {
 		var horaSalida = moment(data.salida).format("HH:mm:ss");
 	    var horaSalidaCorta = moment(data.salida).format("HH:mm");
@@ -90,9 +109,11 @@ var conformarBadge = function(data) {
     } else {
     	var title = 'Entrada: ' + horaEntrada;
     }
-	
 
-	var badge = '<span class="' + clases + '" title="' + title + '">';
+    //Parece ser que los parámetros de HTML no son case-sensitive
+    var identifierParameters =  (typeof data.idSalida === "undefined") ? 'identrada="' + data.idEntrada + '"' : 'identrada="' + data.idEntrada + '" idsalida="' + data.idSalida + '"';
+
+	var badge = '<span class="' + clases + '" title="' + title + '" '+ identifierParameters +'>';
 	badge += 		'<div class="row">'
 	badge += 			'<div class="col-sm-4 m-auto">';
 	badge += 				(typeof data.salida !== "undefined") ? '<span class="m-auto"><i class="fas fa-fw fa-stopwatch ml-1"></i> ' + data.duracion + '</span>' : '';
