@@ -82,10 +82,10 @@ var conformarBadge = function(data) {
 		var badge = '<span class="badge badge-dark w-100 my-1">';
 		badge += 		'<div class="row">'
 		badge += 			'<div class="col-sm-4 m-auto">';
-		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-clock ml-1"></i> ' + data.tiempoTotal + '</span>';
+		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-clock ml-1"></i> ' + data.tiempoParcial + '</span>';
 		badge += 			'</div>';
 		badge += 			'<div class="col-sm-4 m-auto">';
-		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-history"></i> ' + data.tiempoParcial + '</span>';
+		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-history"></i> ' + data.tiempoTotal + '</span>';
 		badge += 			'</div>';
 		badge += 			'<div class="col-sm-4 m-auto">';
 		badge += 				'<span class="m-auto"><i class="fas fa-fw fa-sign-out-alt"></i> ' + data.salidaEstimada + '</span>';
