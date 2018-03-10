@@ -147,8 +147,6 @@ var hParser = function (entry, fecha) {
 
 var dParser = function (rawEntries) {
     var entries = rawEntries.split('\n');
-
-    var dayEntries = [];
     var d;
 
     $.each(entries, function (key, value) {
@@ -157,13 +155,9 @@ var dParser = function (rawEntries) {
         if (protoDate.length == 3) {
             d = new Date(protoDate[2], protoDate[1] - 1, protoDate[0]);
         } else {
-            dayEntries.push(hParser(value, d));
+            addNewRegistro(hParser(value, d));
         }
     });
-
-    $.each(dayEntries, function (key, value) {
-        addNewRegistro(value);
-    })
     
     return
 }

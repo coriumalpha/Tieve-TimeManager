@@ -25,6 +25,7 @@ var deleteBadge = function (listaIds) {
 	registros.length = 0;
 	dias.length = 0;
 
+	//TODO: Habiendo identificado el badge, es más eficiente eliminarlo de la tabla y actualizar un único registro a recalcular la tabla entera
 	$.when(initTablaRegistros()).done(drawFromLocal());
 }
 
@@ -37,6 +38,7 @@ var drawFromLocal = function () {
     });
 }
 
+//Relativamente optimizada
 var addNewRegistro = function (registro) {
     var idDia;
     var dia;
@@ -44,19 +46,18 @@ var addNewRegistro = function (registro) {
     if (registros.length == 0) {
     	registro.id = 1;
     } else {
-    	var orderedByIdDesc = registros.sort(function(r1, r2) {
-    		return r2 - r1;
-    	});
-    	registro.id = orderedByIdDesc[0].id + 1;
+    	registro.id = registros.length + 1;
     }
 
     registros.push(registro);
+
     //Ordenar registros
     registros.sort(function(a, b) {
     	var dateA = new Date(a.fecha);
     	var dateB = new Date(b.fecha);
     	return dateA - dateB;
     });
+
     localStorage.setItem('registros', JSON.stringify(registros))
 
     $.each(dias, function (key, value) {
@@ -82,11 +83,6 @@ var addNewRegistro = function (registro) {
         drawDia(dia, "insert");
     } else {
         dias[idDia].registros.push(registro);
-        dias[idDia].registros.sort(function(a, b) {
-	    	var dateA = new Date(a.fecha);
-	    	var dateB = new Date(b.fecha);
-	    	return dateA - dateB;
-    	});
         drawDia(dias[idDia], "update");
     }
 }
@@ -96,59 +92,58 @@ var calculateEvents = function (registros) {
     //Almacenará la diferencia en segundos (en negativo si se debe tiempo)
     events.diferencia = 0;
     var badges = "";
-
+    
     var registrosEntrada = $.grep(registros, function (value) {
         return value.tipo === tipos.entrada;
     });
 
-    $.each(registrosEntrada, function (key, entrada) {
-        var posiblesSalidas = $.grep(registros, function (value) {
-            return value.codigo === entrada.codigo && value.tipo === tipos.salida && (getDateDiff(entrada.fecha, value.fecha) > 0);
-        });
+	//TODO: Supuestamente arregla problemas de rendimiento
+    $.each(registrosEntrada, function (key, entrada) {	
+		var minDuration;
+    	var salida;
 
-        var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
+    	var horaEntrada = moment(entrada.fecha).format("HH:mm:ss");
         var horaEntradaCorta = moment(entrada.fecha).format("HH:mm");
 
-        if (posiblesSalidas.length == 0) {
-            //Sólo hay entrada, badge de entrar!
-            var badge = {
-        		claseCodigo: codigosLabel[entrada.codigo],
-        		entrada: entrada.fecha,
-        		idEntrada: entrada.id,
-        	}
-        	badges += conformarBadge(badge);
-        } else {
-            //Encontrar el más cercano y hacer badge de entrada-salida con él
-            var minDuration;
-            var salida;
+    	$.each(registros, function(k, value) {
+    		if (value.codigo === entrada.codigo && value.tipo === tipos.salida && (getDateDiff(entrada.fecha, value.fecha) > 0)) {
+    			var posibleSalida = value;
 
-            $.each(posiblesSalidas, function (key, posibleSalida) {
-                if (typeof (minDuration) === "undefined") {
-                    minDuration = getDateDiff(entrada.fecha, posibleSalida.fecha);
-                    salida = posibleSalida;
-                    return
-                }
-                var dateDiff = getDateDiff(entrada.fecha, posibleSalida.fecha);
-                if (dateDiff < minDuration) {
+    			var dateDiff = getDateDiff(entrada.fecha, posibleSalida.fecha);
+
+    			if (typeof (minDuration) === "undefined") {
                     minDuration = dateDiff;
                     salida = posibleSalida;
+                } else if (dateDiff < minDuration) {
+                	minDuration = dateDiff;
+                    salida = posibleSalida;
                 }
-            });
+    		}
+    	})
 
-            var duracionSec = getDateDiff(entrada.fecha, salida.fecha);
-            var duracion = secondsTimeSpanToHMS(duracionSec);
-            //Ir incrementando diferencia del día según van entrando nuevos registros, basándose en el código
-            events.diferencia += calculateEventDifference(entrada.codigo, duracionSec, entrada.fecha);
-
+    	if (typeof salida === "undefined") {
+    		//Sólo hay entrada, badge de entrar!
             var badge = {
         		claseCodigo: codigosLabel[entrada.codigo],
-        		duracion: duracion,
         		entrada: entrada.fecha,
-        		salida: salida.fecha,
         		idEntrada: entrada.id,
-        		idSalida: salida.id,
         	}
         	badges += conformarBadge(badge);
+    	} else {
+    		var duracionSec = getDateDiff(entrada.fecha, salida.fecha);
+	        var duracion = secondsTimeSpanToHMS(duracionSec);
+	        //Ir incrementando diferencia del día según van entrando nuevos registros, basándose en el código
+	        events.diferencia += calculateEventDifference(entrada.codigo, duracionSec, entrada.fecha);
+
+	        var badge = {
+	    		claseCodigo: codigosLabel[entrada.codigo],
+	    		duracion: duracion,
+	    		entrada: entrada.fecha,
+	    		salida: salida.fecha,
+	    		idEntrada: entrada.id,
+	    		idSalida: salida.id,
+	    	}
+	    	badges += conformarBadge(badge);
         }
     });
 
@@ -191,42 +186,56 @@ var calculateEventDifference = function (codigo, duracion, fecha) {
 }
 
 var drawDia = function (dia, method) {
+	//Los registros no tienen por qué llegar ordenados desde la función que llama
     var f = moment(dia.fecha);
     dia.eventos = {};
     dia.eventos = calculateEvents(dia.registros);
     var diferenciaPuntual = secondsTimeSpanToHMS(dia.eventos.diferencia * (-1));
-		
+
+    var diferenciaTotal = 0;
+    var diferenciaHistorica = 0;
+	dia.diferenciaAcumulativa = 0;
+
+	//Procuramos realizar el ordenamiento de registros del día una única vez
+	dia.registros.sort(function(a, b) {
+    	var dateA = new Date(a.fecha);
+    	var dateB = new Date(b.fecha);
+    	return dateA - dateB;
+	});
+
+	//Obtenemos la diferencia acumulada hasta el día de hoy utilizando la almacenada en el día previo más próximo
+	//después se le irá sumando la diferencia del día actual. Después.
     var diasPrevios = $.grep(dias, function(value, key) {
     	var fecha = new Date(value.fecha);
     	var diaActual = new Date(dia.fecha);
     	return fecha < diaActual;
     });
-    var diferenciaTotal = 0;
-	var diferenciaTotalSegundos = 0;
 
-    $.each(diasPrevios, function(key, value) {
-    	diferenciaTotalSegundos += value.eventos.diferencia;
-    });
+    if (diasPrevios.length > 0) {
+	    diasPrevios = diasPrevios.sort(function(a, b) {
+	    	var dateA = new Date(a.fecha);
+	    	var dateB = new Date(b.fecha);
+	    	return dateA - dateB;
+	    });
+	    diferenciaHistorica = diasPrevios[diasPrevios.length - 1].diferenciaAcumulativa;  	
+    }
 
-    diferenciaTotal = secondsTimeSpanToHMS((diferenciaTotalSegundos + dia.eventos.diferencia) * (-1));
+    dia.diferenciaAcumulativa = diferenciaHistorica + dia.eventos.diferencia;
+    diferenciaTotal = secondsTimeSpanToHMS(dia.diferenciaAcumulativa * (-1));
 
-	dia.registros.sort(function(a, b) {
-    	var dateA = new Date(a.fecha);
-    	var dateB = new Date(b.fecha);
-    	return dateA - dateB;
-    });
-	
-	var entradasDia = $.grep(dia.registros, function(value) {
-		return value.tipo === tipos.entrada;
+	var primeraEntrada;
+	$.each(dia.registros, function(key, value) {
+		if (value.tipo === tipos.entrada) {
+			primeraEntrada = value;
+		}
 	});
 	
 	var salidaEstimada = 0;
 	
-	if (entradasDia.length > 0) {
-		var primeraEntrada = entradasDia[0];
+	if (typeof primeraEntrada !== "undefined") {
 		var dow = new Date(primeraEntrada.fecha).getDay();
 		var duracionJornada = (dow == 5) ? tiempos.jornada.intensiva : (tiempos.jornada.normal + tiempos.eventos[7]);
-		var compensacion = (diferenciaTotalSegundos < (15 * 60)) ? ((diferenciaTotalSegundos < (5 * 60)) ? 0 : 5) : 15;
+		var compensacion = (dia.diferenciaAcumulativa < (15 * 60)) ? ((dia.diferenciaAcumulativa < (5 * 60)) ? 0 : 5) : 15;
 		var salidaEstimada = moment(primeraEntrada.fecha).add((duracionJornada * 60) + dia.eventos.diferencia + (compensacion * 60), 'seconds').format("HH:mm")
 	}
 
