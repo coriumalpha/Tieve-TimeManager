@@ -153,11 +153,14 @@ var calculateEvents = function (registros) {
 
 var calculateEventDifference = function (codigo, duracion, fecha) {
 	var diferencia;
-	var dow = new Date(fecha).getDay();
+	var oFecha = new Date(fecha);
+	var dow = oFecha.getDay();
+	var intensivaInit = new Date(2018, 05, 15);
+	var intensivaEnd = new Date(2018, 08, 15);
 
 	switch(codigo) {
 		case "0": 
-			if (dow == 5) {
+			if (dow == 5 || (oFecha > intensivaInit && oFecha < intensivaEnd)) {
 				diferencia = (tiempos.jornada.intensiva * 60) - duracion;
 				break;
 			}
@@ -233,8 +236,12 @@ var drawDia = function (dia, method) {
 	var salidaEstimada = 0;
 	
 	if (typeof primeraEntrada !== "undefined") {
-		var dow = new Date(primeraEntrada.fecha).getDay();
-		var duracionJornada = (dow == 5) ? tiempos.jornada.intensiva : (tiempos.jornada.normal + tiempos.eventos[7]);
+		var oFecha = new Date(primeraEntrada.fecha);
+    	var dow = oFecha.getDay();
+    	var intensivaInit = new Date(2018, 05, 15);
+    	var intensivaEnd = new Date(2018, 08, 15);
+    	
+		var duracionJornada = (dow == 5 || (oFecha > intensivaInit && oFecha < intensivaEnd)) ? tiempos.jornada.intensiva : (tiempos.jornada.normal + tiempos.eventos[7]);
 		var compensacion = (dia.diferenciaAcumulativa < (15 * 60)) ? ((dia.diferenciaAcumulativa < (5 * 60)) ? 0 : 5) : 15;
 		var salidaEstimada = moment(primeraEntrada.fecha).add((duracionJornada * 60) + dia.eventos.diferencia + (compensacion * 60), 'seconds').format("HH:mm")
 	}
