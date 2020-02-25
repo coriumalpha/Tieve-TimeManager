@@ -9,9 +9,9 @@ var tiempos = {
 		intensiva: 411
 	},
 	eventos: {
-		1: 15,
-		6: 6,
-		7: 30,
+		1: 45, //Almuerzo
+		6: 6, //Salidas no remuneradas
+		7: 30, //Hora de comer
 	}
 }
 
